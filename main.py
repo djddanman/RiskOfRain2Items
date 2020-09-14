@@ -7,6 +7,7 @@ from pathlib import Path
 _items_dict = dict()
 data = dict()
 values = list()
+items_dict = dict()
 
 
 def calculate_stack_lambda(base_value, first_item, stack_effect, stack_type, limit=None):
@@ -94,8 +95,8 @@ def select_item_gui(items_dict):
     return item, rarity, effect
 
 
-if __name__ == '__main__':
-    items_dict = get_items_dict()
+def item_stacking():
+    global items_dict
 
     item, rarity, effect = select_item_gui(items_dict)
     item_effect = items_dict[rarity][item][effect]
@@ -103,11 +104,13 @@ if __name__ == '__main__':
     upper_bound = item_effect['limit'][1] + 2 if 'limit' in item_effect else 26
 
     n = np.arange(0, upper_bound, 1)
-    stack_type = item_effect['stack_type']
 
     values = calculate_stack_lambda(item_effect['base_value'], item_effect['first_item'], item_effect['stack_effect'],
                                     item_effect['stack_type'],
                                     item_effect['limit'] if 'limit' in item_effect else None)
+
+    fig = plt.figure()
+    fig.canvas.mpl_connect('close_event', handle_close)
 
     if item == 'Rusted Key':
         plt.plot(n, values[0](n), 'k-', label='Common')
@@ -124,7 +127,19 @@ if __name__ == '__main__':
     plt.ylabel(item_effect['effect'])
     plt.title(item)
 
-    plt.show(block=True)
+    plt.show()
+
+
+def handle_close(evt):
+    print('Closed Figure!')
+
+
+if __name__ == '__main__':
+    items_dict = get_items_dict()
+
+    item_stacking()
+
+    exit()
 
 # TODO Finish adding Lunar items
 # TODO End program or go to menu on plot close
